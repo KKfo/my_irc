@@ -5,7 +5,7 @@
 ** Login   <xxx@epitech.eu>
 ** 
 ** Started on  Wed Apr 15 15:59:03 2015 
-** Last update Thu Apr 16 11:29:40 2015 
+** Last update Sat Apr 18 23:03:22 2015 
 */
 
 #include		"../include/ring_buffer.h"
@@ -44,6 +44,8 @@ void			*lookup_table(t_hash_table *hashtable, char *str)
 {
   unsigned int		hashval;
 
+  if (str == NULL)
+    return (NULL);
   hashval = hash(hashtable, str);
   if (hashtable->table[hashval] != NULL)
     if (strcmp(str, ((t_user**)hashtable->table)[hashval]->name) == 0)
@@ -99,6 +101,8 @@ void			del_elem(t_hash_table *hashtable, char *str)
 {
   unsigned int		hashval;
 
+  if (!str || !hashtable)
+    return ;
   hashval = hash(hashtable, str);
   if (strcmp(str, ((t_user**)hashtable->table)[hashval]->name) == 0)
     {

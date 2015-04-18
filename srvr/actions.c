@@ -5,7 +5,7 @@
 ** Login   <xxx@epitech.eu>
 ** 
 ** Started on  Thu Apr 16 09:42:57 2015 
-** Last update Thu Apr 16 12:41:52 2015 
+** Last update Sat Apr 18 23:34:00 2015 
 */
 
 #include		"../include/defs.h"
@@ -17,18 +17,27 @@ int			nick(char *buff, t_env *e, int fd)
 
   if (buff != NULL)
     {
-      nick = strtok(NULL, "\r");
+      nick = strdup(strtok(NULL, "\r"));
       if (!nick)
         return (0);
       printf("nick to search %s\n", nick);  /* DEBUG */
       found = lookup_table(e->users, nick);
       if (found != NULL)
-        e->guest_buff[fd] = strdup(":my_irc 433 * xxx "
+        {
+          printf("NICKNAME IN USE\n"); /* DEBUG */
+          e->guest_buff[fd] = strdup(":my_irc 433 * xxx "
                                    ":Nickname is already in use.\r\n");
+        }
       else
         {
           add_elem(e->users, nick, fd, sizeof(t_user));
+          free(e->nicks[fd]); /* ADDED */
           e->nicks[fd] = nick;
+          if (e->guest_buff[fd])
+            {
+              free(e->guest_buff[fd]);
+              e->guest_buff[fd] = NULL;
+            }
         }
     }
   return (0);
@@ -36,10 +45,14 @@ int			nick(char *buff, t_env *e, int fd)
 
 int			user(char *buff, t_env *e, int fd)
 {
+  t_user		*found;
+
   UNUSED(buff);
-  UNUSED(e);
-  write(fd, ":my_irc 001 xxx1 :Welcome to the my_irc server xxx1\r\n"
-        , strlen(":my_irc 001 xxx1 :Welcome to the my_irc server xxx1\r\n"));
+  if (e->guest_buff[fd])
+    return (0);
+  found = lookup_table(e->users, e->nicks[fd]);
+  snprintf(found->buff, 1023, ":my_irc 001 %s :Welcome"
+           " to the my_irc server %s\r\n", e->nicks[fd], e->nicks[fd]);
   return (0);
 }
 
@@ -61,25 +74,34 @@ int			join(char *buff, t_env *e, int fd)
 
 int			privmsg(char *buff, t_env *e, int fd)
 {
+  char                  *m;
   char			*to;
-  char			*found;
+  void			*found;
 
+  if (strcmp(e->nicks[fd], "guest") == 0)
+    return (0);
   if (buff != NULL)
     {
+      buff[strlen(buff)] = ' ';
+      m = strdup(buff);
       to = strtok(NULL, " ");
       if (!to)
         return (0);
       if ((found = lookup_table(e->groups, to)))
         {
-          send_to_group(buff, e, to);
+          send_to_group(buff, e, (t_group*)found);
         }
       else if ((found = lookup_table(e->users, to)))
         {
-          send_to_user(buff, e, to);
+          send_to_user(e->nicks[fd], m, (t_user*)found);
         }
       else
-        e->guest_buff[fd] = strdup(":my_irc 433 * xxx "
-                                   ":Nickname is already in use.\r\n");
+        {
+          found = lookup_table(e->users, e->nicks[fd]);
+          snprintf(((t_user*)found)->buff, 1023, ":my_irc 401 %s"
+                   " %s :No such nick/channel\r\n", e->nicks[fd], to);
+        }
+      free(m);  
     }
   return (0);
 }

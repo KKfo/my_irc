@@ -5,15 +5,17 @@
 ** Login   <xxx@epitech.eu>
 ** 
 ** Started on  Tue Apr 14 20:34:12 2015 
-** Last update Thu Apr 16 11:56:43 2015 
+** Last update Sat Apr 18 23:31:37 2015 
 */
 
 #include	"../include/defs.h"
 
 int		prepare_fds(t_env *e)
 {
+  t_user		*u;
   int		i;
 
+  UNUSED(u);
   FD_ZERO(&e->fd_read);
   FD_ZERO(&e->fd_write);     
   e->fd_max = 0;
@@ -22,7 +24,11 @@ int		prepare_fds(t_env *e)
       if (e->fd_type[i] != FD_FREE)
         {
           FD_SET(i, &e->fd_read);
-          FD_SET(i, &e->fd_write);
+          u = lookup_table(e->users, e->nicks[i]);
+          /* if ((u && u->buff[0]) || e->guest_buff[i]) */
+          /*   { */
+              FD_SET(i, &e->fd_write);
+            /* } */
           e->fd_max = i;
         }
     }
@@ -84,6 +90,7 @@ int			main(int argc, char **argv)
           execute_reads(&e);
           execute_writes(&e);
         }
+      /* sleep(10); */
     }
   return (0);
 }

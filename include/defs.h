@@ -5,7 +5,7 @@
 ** Login   <xxx@epitech.eu>
 ** 
 ** Started on  Tue Apr 14 20:01:47 2015 
-** Last update Thu Apr 16 11:57:24 2015 
+** Last update Sat Apr 18 20:32:52 2015 
 */
 
 #ifndef				DEFS_H_
@@ -56,6 +56,8 @@ typedef struct		s_env
 
 typedef int (*t_action)(char *buff, t_env *e, int fd);
 
+int			send_to_user(char *from, char *msg, t_user *u);
+int			send_to_group(char *msg, t_env *e, t_group *g);
 int			nick(char *buff, t_env *e, int fd);
 int			user(char *buff, t_env *e, int fd);
 int			part(char *buff, t_env *e, int fd);

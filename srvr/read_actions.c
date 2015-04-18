@@ -5,7 +5,7 @@
 ** Login   <xxx@epitech.eu>
 ** 
 ** Started on  Wed Apr 15 22:33:18 2015 
-** Last update Thu Apr 16 12:35:14 2015 
+** Last update Sat Apr 18 23:04:20 2015 
 */
 
 #include		"../include/defs.h"
@@ -40,7 +40,7 @@ int			do_handle(char *buff, t_env *e, int fd)
 
   i = 0;
   str = strtok(buff, " ");
-  if (buff[0] != ':')
+  if (buff[0] == ':')
     str = strtok(NULL, " ");
   while (cmds[i] && strcmp(cmds[i], str))
     i++;
@@ -55,7 +55,7 @@ void			client_read(t_env *e, int fd)
   char			buf[1024];
 
   r = read(fd, buf, 1023);
-  if (r > 0)
+  if (r > 0 && r < 1023)
     {
       buf[r] = '\0';
       do_handle(buf, e, fd);
@@ -64,6 +64,9 @@ void			client_read(t_env *e, int fd)
     {
       printf("%d: Connection closed\n", fd);
       close(fd);
+      del_elem(e->users, e->nicks[fd]);
+      free(e->nicks[fd]);
+      e->nicks[fd] = NULL;
       e->fd_type[fd] = FD_FREE;
     }
 }
