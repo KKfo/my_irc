@@ -5,7 +5,7 @@
 ** Login   <xxx@epitech.eu>
 ** 
 ** Started on  Tue Apr 14 20:34:12 2015 
-** Last update Sat Apr 18 23:31:37 2015 
+** Last update Mon Apr 20 22:28:10 2015 
 */
 
 #include	"../include/defs.h"
@@ -15,7 +15,6 @@ int		prepare_fds(t_env *e)
   t_user		*u;
   int		i;
 
-  UNUSED(u);
   FD_ZERO(&e->fd_read);
   FD_ZERO(&e->fd_write);     
   e->fd_max = 0;
@@ -24,11 +23,12 @@ int		prepare_fds(t_env *e)
       if (e->fd_type[i] != FD_FREE)
         {
           FD_SET(i, &e->fd_read);
+          if (e->nicks[i] != GUEST)
           u = lookup_table(e->users, e->nicks[i]);
-          /* if ((u && u->buff[0]) || e->guest_buff[i]) */
-          /*   { */
+          if ((u && u->buff[0]) || e->guest_buff[i])
+            {
               FD_SET(i, &e->fd_write);
-            /* } */
+            }
           e->fd_max = i;
         }
     }
@@ -66,18 +66,19 @@ int			main(int argc, char **argv)
   t_env         	e;
   int			p;
 
+  nr = 1;
   memset(&e, 0, sizeof(e));
   e.users = create_hshtbl(255);
   e.groups = create_hshtbl(255);
   if (argc != 2 || !(p = atoi(argv[1])))
     {
+      printf("Usage: %s port", argv[0]);
       return (0);
     }
   add_server(p, &e);
-  nr = 1;
   while (1)
     {
-      printf("waiting...\n");
+      printf("Waiting for connections...\n");
       tv.tv_sec = 1000;
       tv.tv_usec = 11;
       if (nr)
@@ -90,7 +91,6 @@ int			main(int argc, char **argv)
           execute_reads(&e);
           execute_writes(&e);
         }
-      /* sleep(10); */
     }
   return (0);
 }

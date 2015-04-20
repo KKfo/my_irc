@@ -5,7 +5,7 @@
 ** Login   <xxx@epitech.eu>
 ** 
 ** Started on  Wed Apr 15 15:59:03 2015 
-** Last update Sat Apr 18 23:03:22 2015 
+** Last update Mon Apr 20 15:39:30 2015 
 */
 
 #include		"../include/ring_buffer.h"
@@ -70,7 +70,7 @@ void            add_fd(char **arr, char *usr)
   return ;
 }
 
-int		add_elem(t_hash_table *hashtable, char *str,
+void		*add_elem(t_hash_table *hashtable, char *str,
                          int fd, size_t size)
 {
   void		*new_elem;
@@ -82,19 +82,26 @@ int		add_elem(t_hash_table *hashtable, char *str,
   if (current_elem != NULL)
     {
       printf("add_name: %s item already exist\n", str);
-      return (2);
+      return (NULL);
     }
-  if ((new_elem = malloc(size)) == NULL)
-    return (1);
+  if ((new_elem = calloc(1, size)) == NULL)
+    return (NULL);
   ((t_user*)new_elem)->name = strdup(str);
   if (size == sizeof(t_user))
-    ((t_user*)new_elem)->fd = fd;
+    {
+      write(1, "ddd\n", 4); /* dddd */
+      ((t_user*)new_elem)->fd = fd;
+      ((t_user*)new_elem)->h = ((t_user*)new_elem)->buff;
+      ((t_user*)new_elem)->c = ((t_user*)new_elem)->buff;
+      /* printf("point b %p point c %p\n", ((t_user*)new_elem)->buff, ((t_user*)new_elem)->c); /\* DEBUG *\/ */
+    }
   else
     {
+      printf("Weirddd: group requested %lu\n", sizeof(t_user));  /* DEBUG */
       add_fd(((t_group*)new_elem)->usrs, str);
     }
   hashtable->table[hashval] = new_elem;
-  return (0);
+  return (new_elem);
 }
 
 void			del_elem(t_hash_table *hashtable, char *str)
@@ -104,13 +111,14 @@ void			del_elem(t_hash_table *hashtable, char *str)
   if (!str || !hashtable)
     return ;
   hashval = hash(hashtable, str);
-  if (strcmp(str, ((t_user**)hashtable->table)[hashval]->name) == 0)
-    {
-      free(((t_user**)hashtable->table)[hashval]->name);
-      free(hashtable->table[hashval]);
-      hashtable->table[hashval] = NULL;
-      return ;
-    }
+  if (((t_user**)hashtable->table)[hashval])
+    if (strcmp(str, ((t_user**)hashtable->table)[hashval]->name) == 0)
+      {
+        free(((t_user**)hashtable->table)[hashval]->name);
+        free(hashtable->table[hashval]);
+        hashtable->table[hashval] = NULL;
+        return ;
+      }
   return ;
 }
 

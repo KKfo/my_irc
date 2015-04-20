@@ -5,7 +5,7 @@
 ** Login   <xxx@epitech.eu>
 ** 
 ** Started on  Wed Apr 15 22:33:18 2015 
-** Last update Sat Apr 18 23:04:20 2015 
+** Last update Mon Apr 20 23:06:22 2015 
 */
 
 #include		"../include/defs.h"
@@ -24,7 +24,7 @@ int			do_actions(char *buff, int i, t_env *e, int fd)
     }
   else
     {
-      printf("error: comand not recognized\n");
+      printf("error: %s comand not recognized\n", buff);
     }
   return (0);
 }
@@ -39,30 +39,67 @@ int			do_handle(char *buff, t_env *e, int fd)
                                     NULL};
 
   i = 0;
-  str = strtok(buff, " ");
+  if ((str = strtok(buff, " ")) == NULL)
+    return (EXIT_FAILURE);
   if (buff[0] == ':')
-    str = strtok(NULL, " ");
+    if ((str = strtok(NULL, " ")) == NULL)
+      return (EXIT_FAILURE);
   while (cmds[i] && strcmp(cmds[i], str))
     i++;
   if (do_actions(buff, i, e, fd))
     return (EXIT_FAILURE);
-  return (0);
+  return (EXIT_SUCCESS);
+}
+
+char			**to_tok(char *str, char **res)
+{
+  int			i;
+  char			**send;
+
+  res[0] = str;
+  send = res;
+  res++;
+  i = 0;
+  while (*str && i < 511)
+    {
+      if (*str == '\n' && *(str - 1) == '\r')
+        {
+          *str = '\0';
+          if (*(str + 1))
+            {
+              *res = str + 1;
+              res++;
+            }
+        }
+      str++;
+      i++;
+    }
+  *res = NULL;
+  return (send);
 }
 
 void			client_read(t_env *e, int fd)
 {
-  size_t		r;
+  char			**tok;
+  int			r;
   char			buf[1024];
+  char			*res[512];
 
-  r = read(fd, buf, 1023);
-  if (r > 0 && r < 1023)
+  r = read(fd, buf, 512);
+  if (r > 0)
     {
       buf[r] = '\0';
-      do_handle(buf, e, fd);
+      tok = to_tok(buf, res);
+      while(tok && *tok)
+        {
+          if (do_handle(*tok, e, fd))
+            printf("Do handle %u\n", (unsigned int)r);
+          tok++;
+        }
     }
   else
     {
-      printf("%d: Connection closed\n", fd);
+      printf("%s: Connection closed\n", e->nicks[fd]);
       close(fd);
       del_elem(e->users, e->nicks[fd]);
       free(e->nicks[fd]);

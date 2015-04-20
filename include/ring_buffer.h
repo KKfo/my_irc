@@ -5,7 +5,7 @@
 ** Login   <xxx@epitech.eu>
 ** 
 ** Started on  Wed Apr 15 12:28:24 2015 
-** Last update Thu Apr 16 11:31:34 2015 
+** Last update Sun Apr 19 20:34:07 2015 
 */
 
 #ifndef			RING_BUFFER_H_
@@ -28,6 +28,8 @@ typedef struct	s_user
 {
   char		*name;
   char          buff[1024];
+  char		*h;
+  char		*c;
   int		fd;
 } t_user;
 
@@ -45,7 +47,7 @@ typedef struct	s_hash_table
 
 t_hash_table		*create_hshtbl(int size);
 void			*lookup_table(t_hash_table *hashtable, char *str);
-int			add_elem(t_hash_table *hashtable, char *str,
+void			*add_elem(t_hash_table *hashtable, char *str,
                                  int fd, size_t size);
 void			del_elem(t_hash_table *hashtable, char *str);
 void			free_table(t_hash_table *hashtable);

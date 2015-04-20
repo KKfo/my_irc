@@ -5,7 +5,7 @@
 ** Login   <xxx@epitech.eu>
 ** 
 ** Started on  Tue Apr 14 20:01:47 2015 
-** Last update Sat Apr 18 20:32:52 2015 
+** Last update Mon Apr 20 21:56:35 2015 
 */
 
 #ifndef				DEFS_H_
@@ -14,6 +14,7 @@
 # define			FD_CLIENT 1
 # define			FD_SERVER 2 
 # define			MAX_FD  255
+# define			GUEST (void*)-1
 # define			UNUSED(x) (void)(x)
 # include			<unistd.h>
 # include			<stdio.h>
@@ -29,7 +30,7 @@
 # include			<sys/socket.h>
 # include			<netdb.h>
 # include			"ring_buffer.h"
-
+# include			<signal.h>
 typedef struct		s_listen
 {
   struct sockaddr_in	s_in;
