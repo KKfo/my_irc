@@ -1,0 +1,58 @@
+#!/bin/bash
+
+i=0
+
+#;
+
+if [ "$2" == "t" ] ; then
+    
+    exec 3<>/dev/tcp/127.0.0.1/$1
+    echo -e "NICK xxx\r" >&3
+    sleep 1
+    echo -e "USER xxx\r" >&3
+    sleep 1
+fi
+
+function do_it()
+{
+    j=4
+    r=$2
+    while [ $j -le 20 ]
+    do
+        sleep 2
+        unset fd
+        eval 'exec {fd}<>/dev/tcp/127.0.0.1/$1'
+        echo -e "NICK xxx$r\r" >&$fd
+        echo -e "USER xxx$r\r" >&$fd
+        r=$[$r+1]
+        i=0
+        while [ $i -le 50 ]
+        do
+            echo -e "PRIVMSG xxx :hello $i\r" >&$fd
+            i=$[$i+1]
+        done
+        j=$[$j+1]
+    done
+}
+
+function  do_test()
+{
+    r=$(( ( RANDOM % 10 )  + 1 ))
+    do_it $1 $r
+    j=4
+    while [ $j -le 20 ]
+    do
+        eval "exec $j>&-"
+        j=$[$j+1]
+    done
+}
+
+do_test $1 &
+
+sleep 1
+if [ "$2" == "t" ] ; then
+    cat <&3 &
+    sleep 60
+    killall cat
+fi
+exec 3<&-

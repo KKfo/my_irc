@@ -1,0 +1,24 @@
+#!/bin/bash
+
+i=0
+
+    exec 3<>/dev/tcp/127.0.0.1/$1 ; exec 4<>/dev/tcp/127.0.0.1/$1
+
+while [ $i -le 1 ]
+do
+    echo -e "NICK xxx\r" >&3
+    sleep 1
+    echo -e "USER xxx\r" >&3
+    cat <&3 &
+    sleep 1
+    killall cat
+    echo -e "NICK xxx\r" >&4
+    sleep 1
+    echo -e "USER xxx\r" >&4
+    cat <&4 &
+    killall cat
+    sleep 2
+    i=$[$i+1]
+done
+exec 3<&-
+exec 4<&-
