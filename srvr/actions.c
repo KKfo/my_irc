@@ -5,7 +5,7 @@
 ** Login   <xxx@epitech.eu>
 ** 
 ** Started on  Thu Apr 16 09:42:57 2015 
-** Last update Mon Apr 20 22:49:06 2015 
+** Last update Fri Apr 24 03:51:15 2015 
 */
 
 #include		"../include/defs.h"
@@ -20,7 +20,6 @@ int			nick(char *buff, t_env *e, int fd)
     return (0);
   if ((found = lookup_table(e->users, nick)))
     {
-      printf("NICKNAME IN USE\n"); /* DEBUG */
       e->guest_buff[fd] = strdup(":my_irc 433 * xxx "
                                  ":Nickname is already in use.\r\n");
     }
@@ -60,14 +59,32 @@ int			part(char *buff, t_env *e, int fd)
 
 int			join(char *buff, t_env *e, int fd)
 {
+  int			i;
+  t_user		*u;
+  t_group		*new_group;
+  char			*name;
+  char			b[512];
+
   UNUSED(buff);
-  UNUSED(e);
-  UNUSED(fd);
+  i = 0;
+  name = strtok(NULL, "\r");
+  if (!(new_group = lookup_table(e->groups, name)))
+    new_group = add_elem(e->groups, name,
+                       0, sizeof(t_group));
+  u = lookup_table(e->users, e->nicks[fd]);
+  ((t_user**)new_group->usrs->table)[u->hsh] = u;
+  while (u->g[i])
+    i++;
+  u->g[i] = hash(e->groups, name);
+  snprintf(b, 511, "JOIN %s", name);
+  send_to_group(e->nicks[fd], b, e, new_group);
+  send_join(e->nicks[fd], (t_user**)new_group->usrs->table, name, u);
   return (0);
 }
 
 int			privmsg(char *buff, t_env *e, int fd)
 {
+  char			b[512];
   char			*tmp;
   char                  *m;
   char			*to;
@@ -77,25 +94,20 @@ int			privmsg(char *buff, t_env *e, int fd)
   if (e->nicks[fd] == GUEST || !buff
       || !(tmp = strtok(NULL, " ")))
     return (0);
-  printf("tmp %s\n", tmp);
   to = strdup(tmp);
   buff[strlen(buff)] = ' ';
   tmp[strlen(tmp)] = ' ';
   if ((found = lookup_table(e->groups, to)))
-    {
-      send_to_group(buff, e, (t_group*)found);
-    }
+      send_to_group(e->nicks[fd], buff, e, (t_group*)found);
   else if ((found = lookup_table(e->users, to)))
-    {
-      printf("Send message: %s\n", m); /* DEBUG */
       send_to_user(e->nicks[fd], m, (t_user*)found);
-    }
   else
     {
       found = lookup_table(e->users, e->nicks[fd]);
-      snprintf(((t_user*)found)->buff, 1023, ":my_irc 401 %s"
+      snprintf(b, 1023, ":my_irc 401 %s"
                " %s :No such nick/channel\r\n", e->nicks[fd], to);
+      respond(b, found);
     }
-  free(to);  
+  free(to);
   return (0);
 }

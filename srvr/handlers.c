@@ -5,14 +5,13 @@
 ** Login   <xxx@epitech.eu>
 ** 
 ** Started on  Tue Apr 14 21:00:39 2015 
-** Last update Mon Apr 20 22:24:32 2015 
+** Last update Sat Apr 25 19:02:54 2015 
 */
 
 #include		"../include/defs.h"
 
 int			is_guest(t_env *e, int fd)
 {
-  printf("guest\n"); /* DEBUG */
   if (e->guest_buff[fd])
     {
       write(fd, e->guest_buff[fd], strlen(e->guest_buff[fd]));
@@ -29,7 +28,7 @@ int			is_registered(t_env *e, int fd)
   u = lookup_table(e->users, e->nicks[fd]);
   if (u && u->buff[0])
     {
-      write(fd, u->buff, strlen(u->buff));
+      write(fd, u->buff, 1024/* strlen(u->buff) */);
       u->c = u->h;
       memset(u->buff, 0, strlen(u->buff));
     }
@@ -55,7 +54,7 @@ void			add_client(t_env *e, int s)
 {
   int			cs;
   struct sockaddr_in	client_sin;
-  socklen_t			client_sin_len;
+  socklen_t		client_sin_len;
 
   client_sin_len = sizeof(client_sin);
   cs = accept(s, (struct sockaddr *)&client_sin, &client_sin_len);

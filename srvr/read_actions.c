@@ -5,7 +5,7 @@
 ** Login   <xxx@epitech.eu>
 ** 
 ** Started on  Wed Apr 15 22:33:18 2015 
-** Last update Mon Apr 20 23:06:22 2015 
+** Last update Fri Apr 24 15:56:22 2015 
 */
 
 #include		"../include/defs.h"
@@ -60,7 +60,7 @@ char			**to_tok(char *str, char **res)
   send = res;
   res++;
   i = 0;
-  while (*str && i < 511)
+  while (*str && i < 1022)
     {
       if (*str == '\n' && *(str - 1) == '\r')
         {
@@ -83,9 +83,9 @@ void			client_read(t_env *e, int fd)
   char			**tok;
   int			r;
   char			buf[1024];
-  char			*res[512];
+  char			*res[1024];
 
-  r = read(fd, buf, 512);
+  r = read(fd, buf, 1023);
   if (r > 0)
     {
       buf[r] = '\0';

@@ -5,7 +5,7 @@
 ## Login   <flores_a@epitech.eu>
 ## 
 ## Started on  Sat Mar 21 14:44:31 2015 
-## Last update Thu Apr 16 13:18:40 2015 
+## Last update Fri Apr 24 05:11:17 2015 
 ##
 
 #CLNT_SRC =		clnt/
@@ -16,6 +16,7 @@ SRVR_SRC =		srvr/hashtbl.c \
 				srvr/main.c \
 				srvr/read_actions.c \
 				srvr/send.c \
+				srvr/extra.c \
 
 CLNT_OBJ =		$(CLNT_SRC:.c=.o)
 

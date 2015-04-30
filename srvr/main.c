@@ -5,7 +5,7 @@
 ** Login   <xxx@epitech.eu>
 ** 
 ** Started on  Tue Apr 14 20:34:12 2015 
-** Last update Mon Apr 20 22:28:10 2015 
+** Last update Thu Apr 23 16:25:55 2015 
 */
 
 #include	"../include/defs.h"
@@ -68,8 +68,8 @@ int			main(int argc, char **argv)
 
   nr = 1;
   memset(&e, 0, sizeof(e));
-  e.users = create_hshtbl(255);
-  e.groups = create_hshtbl(255);
+  e.users = create_hshtbl(255, 'u');
+  e.groups = create_hshtbl(255, 'g');
   if (argc != 2 || !(p = atoi(argv[1])))
     {
       printf("Usage: %s port", argv[0]);

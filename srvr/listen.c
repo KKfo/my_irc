@@ -5,7 +5,7 @@
 ** Login   <xxx@epitech.eu>
 ** 
 ** Started on  Tue Apr 14 19:58:08 2015 
-** Last update Thu Apr 16 11:40:54 2015 
+** Last update Fri Apr 24 04:32:07 2015 
 */
 
 #include			"../include/defs.h"
@@ -19,7 +19,8 @@ static char			init_socket(t_listen *v)
       perror("getprotobyname");
       return (EXIT_FAILURE);
     }
-  if ((v->socket_fd = socket(AF_INET, SOCK_STREAM, s_p->p_proto)) == -1)
+  if ((v->socket_fd = socket(AF_INET, SOCK_STREAM
+                             , s_p->p_proto)) == -1)
     {
       perror("socket");
       return (EXIT_FAILURE);
